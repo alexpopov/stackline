@@ -14,7 +14,7 @@ stackline.window = require'stackline.window'
 
 function stackline:init(userConfig) -- {{{
     log.i'Initializing stackline'
-    if stackline.manager then -- re-initializtion guard https://github.com/AdamWagner/stackline/issues/46
+    if stackline.manager then -- re-initializition guard https://github.com/AdamWagner/stackline/issues/46
         return log.i'stackline already initialized'
     end
 

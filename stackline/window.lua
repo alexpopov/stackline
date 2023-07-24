@@ -39,7 +39,7 @@ function Window:isStackFocused() -- {{{
 end -- }}}
 
 function Window:setupIndicator() -- {{{
-    log.d('setupIndicator for', self.id)
+    log.d('setupIndicator for', self.id, self.app)
     self.config = stackline.config:get('appearance')
     local c = self.config
     self.showIcons = c.showIcons
@@ -80,7 +80,7 @@ function Window:setupIndicator() -- {{{
 end -- }}}
 
 function Window:drawIndicator(overrideOpts) -- {{{
-    log.i('drawIndicator for', self.id)
+    log.i('drawIndicator for', self.id, self.app)
     -- should there be a dedicated "Indicator" class to perform the actual drawing?
     local opts = u.extend(self.config, overrideOpts or {})
     local radius = self.showIcons and self.iconRadius or opts.radius
@@ -128,9 +128,9 @@ function Window:drawIndicator(overrideOpts) -- {{{
 end -- }}}
 
 function Window:redrawIndicator() -- {{{
-    log.i('redrawIndicator for', self.id)
     local isWindowFocused = self:isFocused()
     local isStackFocused = self:isStackFocused()
+    log.i('redrawIndicator for', self.id, self.app, "is focused:", isWindowFocused)
 
     -- has stack, window focus changed?
     local stackFocusChange = isStackFocused ~= self.stackFocus
@@ -343,14 +343,14 @@ function Window:makeStackId(hsWin) -- {{{
 end -- }}}
 
 function Window:deleteIndicator() -- {{{
-    log.d('deleteIndicator for', self.id)
+    log.d('deleteIndicator for', self.id, self.app)
     if self.indicator then
         self.indicator:delete(self.config.fadeDuration)
     end
 end -- }}}
 
 function Window:unfocusOtherAppWindows() -- {{{
-    log.i('unfocusOtherAppWindows for', self.id)
+    log.i('unfocusOtherAppWindows for', self.id, self.app)
     u.each(self.otherAppWindows, function(w)
         w:redrawIndicator()
     end)

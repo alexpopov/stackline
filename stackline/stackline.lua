@@ -57,7 +57,7 @@ stackline.events = { -- {{{
     wf.windowCreated,
     wf.windowUnhidden,
 
-    wf.windowMoved, -- NOTE: winMoved includes move AND resize evts
+    wf.windowMoved, -- NOTE: winMoved includes move AND resize events
     wf.windowUnminimized,
 
     wf.windowFullscreened,
@@ -81,19 +81,19 @@ stackline.events = { -- {{{
 }                                   -- }}}
 
 function stackline:setupListeners() -- {{{
-  -- On each win evt above, run update at most once every maxRefreshRate (defaults to 0.3s))
+  -- On each win event above, run update at most once every maxRefreshRate (defaults to 0.3s))
   -- update = query window state & check if redraw needed
-  self.wf:subscribe(self.events.checkOn, function(_win, _app, evt)
+  self.wf:subscribe(self.events.checkOn, function(_win, _app, event)
     self.forceRedraw = u.contains( -- forceRedraw depending on the type of event
       self.events.forceCheckOn,
-      evt
+      event
     )
 
-    log.i('Window event:', evt, 'force:', self.forceRedraw)
+    log.i('Window event:', event, 'force:', self.forceRedraw)
     self.queryWindowState:start()
   end)
 
-  -- On each win evt listed, simply *redraw* indicators
+  -- On each win event listed, simply *redraw* indicators
   -- No need for heavyweight query + refresh
   self.wf:subscribe(
     self.events.redrawOn,
@@ -129,7 +129,7 @@ function stackline:refreshClickTracker()          -- {{{
   end
 end                                                      -- }}}
 
-function stackline.redrawWinIndicator(hsWin, _app, _evt) -- {{{
+function stackline.redrawWinIndicator(hsWin, _app, _event) -- {{{
   --[[ Dedicated redraw method to *adjust* the existing canvas element is WAY
        faster than deleting the entire indicator & rebuilding it from scratch,
        particularly since this skips querying the app icon & building the icon image.

@@ -80,8 +80,7 @@ function Window:setupIndicator() -- {{{
 end                                         -- }}}
 
 function Window:drawIndicator(overrideOpts) -- {{{
-  log.i('drawIndicator for', self.id, self.app)
-  -- should there be a dedicated "Indicator" class to perform the actual drawing?
+  -- TODO: should there be a dedicated "Indicator" class to perform the actual drawing?
   local opts = stackline.utils.extend(self.config, overrideOpts or {})
   local radius = self.showIcons and self.iconRadius or opts.radius
   local fadeDuration = opts.shouldFade and opts.fadeDuration or 0
@@ -92,6 +91,7 @@ function Window:drawIndicator(overrideOpts) -- {{{
   if self.indicator then
     self.indicator:delete()
   end
+  log.i('drawIndicator for', self.id, self.app, "stack focused: ", self.stackFocus, "window focused:", self.focus)
 
   -- TODO: Should we really create a new canvas for each window? Or should
   -- there be one canvas per screen/space into which each window's indicator element is appended?
@@ -149,10 +149,13 @@ function Window:redrawIndicator() -- {{{
   -- TODO: Fix bug causing stack to continue appearing focused when switching to a non-stacked window from the same app as the focused stack window. Another casualtiy of HS #2400 :<
   if noChange then
     -- bail early if there's nothing to do
+    log.i("    redraw: noop")
     return false
   elseif bothChange then
     -- If both change, it means a *focused* window's stack is now unfocused.
     self.stackFocus = isStackFocused
+    self.focus = isWindowFocused
+    log.i("    bothChange", self.id, self.app, "self.focused?", self.focus)
     self.stack:redrawAllIndicators({ except = self.id })
     log.i(self.id, self.app, "self.focused?", self.focus)
     self.focus = isWindowFocused

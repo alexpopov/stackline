@@ -82,7 +82,7 @@ end                                         -- }}}
 function Window:drawIndicator(overrideOpts) -- {{{
   log.i('drawIndicator for', self.id, self.app)
   -- should there be a dedicated "Indicator" class to perform the actual drawing?
-  local opts = _G.stackline.utils.extend(self.config, overrideOpts or {})
+  local opts = stackline.utils.extend(self.config, overrideOpts or {})
   local radius = self.showIcons and self.iconRadius or opts.radius
   local fadeDuration = opts.shouldFade and opts.fadeDuration or 0
 
@@ -249,11 +249,11 @@ function Window:getColorAttrs(isStackFocused, isWinFocused) -- {{{
       ['true'] = {
         window = {
           ['true'] = {
-            bg = _G.stackline.utils.extend(opts.color, { alpha = opts.alpha }),
+            bg = stackline.utils.extend(opts.color, { alpha = opts.alpha }),
             img = opts.alpha,
           },
           ['false'] = {
-            bg = _G.stackline.utils.extend(_G.stackline.utils.copy(opts.color),
+            bg = stackline.utils.extend(stackline.utils.copy(opts.color),
               { alpha = opts.alpha / opts.dimmer }),
             img = opts.alpha / opts.iconDimmer,
           },
@@ -262,14 +262,14 @@ function Window:getColorAttrs(isStackFocused, isWinFocused) -- {{{
       ['false'] = {
         window = {
           ['true'] = {
-            bg = _G.stackline.utils.extend(_G.stackline.utils.copy(opts.color), {
+            bg = stackline.utils.extend(stackline.utils.copy(opts.color), {
               alpha = opts.alpha / (opts.dimmer / 1.2),
             }),
             -- last-focused icon stays full alpha when stack unfocused
             img = opts.alpha,
           },
           ['false'] = {
-            bg = _G.stackline.utils.extend(_G.stackline.utils.copy(opts.color), {
+            bg = stackline.utils.extend(stackline.utils.copy(opts.color), {
               alpha = stackline.manager:getShowIconsState() and 0 or
                   0.2,
             }),
@@ -329,8 +329,8 @@ function Window:makeStackId(hsWin) -- {{{
   local h = frame.h
 
   local fuzzFactor = stackline.config:get('features.fzyFrameDetect.fuzzFactor')
-  local roundToFuzzFactor = _G.stackline.utils.partial(_G.stackline.utils.roundToNearest, fuzzFactor)
-  local ff = _G.stackline.utils.map({ x, y, w, h }, roundToFuzzFactor)
+  local roundToFuzzFactor = stackline.utils.partial(stackline.utils.roundToNearest, fuzzFactor)
+  local ff = stackline.utils.map({ x, y, w, h }, roundToFuzzFactor)
 
   return {
     topLeft = table.concat({ x, y }, '|'),
@@ -348,7 +348,7 @@ end                                      -- }}}
 
 function Window:unfocusOtherAppWindows() -- {{{
   log.i('unfocusOtherAppWindows for', self.id, self.app)
-  _G.stackline.utils.each(self.otherAppWindows, function(w)
+  stackline.utils.each(self.otherAppWindows, function(w)
     w:redrawIndicator()
   end)
 end                              -- }}}

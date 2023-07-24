@@ -33,23 +33,23 @@ Config.types = { -- {{{
   },
   ['table'] = {
     validator = v.is_table,
-    coerce = _G.stackline.utils.identity,
+    coerce = stackline.utils.identity,
   },
   ['boolean'] = {
     validator = v.is_boolean,
-    coerce = _G.stackline.utils.toBool,
+    coerce = stackline.utils.toBool,
   },
   ['color'] = {
-    validator = _G.stackline.utils.cb(is_color),
-    coerce = _G.stackline.utils.identity,
+    validator = stackline.utils.cb(is_color),
+    coerce = stackline.utils.identity,
   },
   ['winTitles'] = {
-    validator = _G.stackline.utils.cb(v.in_list { true, false, 'when_switching', 'not_implemented', }),
-    coerce = _G.stackline.utils.identity,
+    validator = stackline.utils.cb(v.in_list { true, false, 'when_switching', 'not_implemented', }),
+    coerce = stackline.utils.identity,
   },
   ['dynamicLuminosity'] = {
-    validator = _G.stackline.utils.cb(v.in_list { true, false, 'not_implemented' }),
-    coerce = _G.stackline.utils.identity,
+    validator = stackline.utils.cb(v.in_list { true, false, 'not_implemented' }),
+    coerce = stackline.utils.identity,
   },
 }                              -- }}}
 
@@ -114,7 +114,7 @@ function Config:init(conf) -- {{{
 end                                             -- }}}
 
 function Config:getPathSchema(path)             -- {{{
-  local _type = _G.stackline.utils.getfield(path, self.schema)   -- lookup type in schema
+  local _type = stackline.utils.getfield(path, self.schema)   -- lookup type in schema
   if not _type then return false end
   local validator = self.types[_type].validator()
 
@@ -122,8 +122,8 @@ function Config:getPathSchema(path)             -- {{{
 end                                           -- }}}
 
 function Config.generateValidator(schemaType) -- {{{
-  if _G.stackline.utils.istable(schemaType) then               -- recursively build validator
-    local children = _G.stackline.utils.map(schemaType, Config.generateValidator)
+  if stackline.utils.istable(schemaType) then               -- recursively build validator
+    local children = stackline.utils.map(schemaType, Config.generateValidator)
     log.d('validator children:\n', hs.inspect(children))
     return v.is_table(children)
   end
@@ -143,9 +143,9 @@ function Config:validate(conf)                       -- {{{
   if isValid then
     log.i('✓ Conf validated successfully')
     self.conf = conf
-    self.autosuggestions = _G.stackline.utils.keys(_G.stackline.utils.flattenPath(self.conf))
+    self.autosuggestions = stackline.utils.keys(stackline.utils.flattenPath(self.conf))
   else
-    local invalidKeys = table.concat(_G.stackline.utils.keys(_G.stackline.utils.flattenPath(err)), ', ')
+    local invalidKeys = table.concat(stackline.utils.keys(stackline.utils.flattenPath(err)), ', ')
     log.e('Invalid stackline config:\n', hs.inspect(err))
     hs.notify.new(nil, {
       title           = 'Invalid stackline config!',
@@ -168,7 +168,7 @@ function Config:get(path) -- {{{
   -- path is a dot-separated string, e.g., 'appearance.color'
   -- returns value at path or full config if path not provided
   if path == nil then return self.conf end
-  local val = _G.stackline.utils.getfield(path, self.conf)
+  local val = stackline.utils.getfield(path, self.conf)
 
   if val == nil then
     return log.w(('config.get("%s") not found'):format(path))
@@ -196,17 +196,17 @@ function Config:set(path, val) -- {{{
     return self
   end
 
-  _G.stackline.utils.setfield(path, typedVal, self.conf)
+  stackline.utils.setfield(path, typedVal, self.conf)
 
-  local onChange = _G.stackline.utils.getfield(path, self.events, true)
-  if _G.stackline.utils.isfunc(onChange) then onChange() end
+  local onChange = stackline.utils.getfield(path, self.events, true)
+  if stackline.utils.isfunc(onChange) then onChange() end
 
   return self, val
 end                         -- }}}
 
 function Config:toggle(key) -- {{{
   local val = self:get(key)
-  if not _G.stackline.utils.isbool(val) then
+  if not stackline.utils.isbool(val) then
     log.w(key, 'cannot be toggled because it is not boolean')
     return self
   end

@@ -14,7 +14,7 @@ function Stack:get()   -- {{{
 end                    -- }}}
 
 function Stack:getHs() -- {{{
-  return _G.stackline.utils.map(self.windows, function(w)
+  return stackline.utils.map(self.windows, function(w)
     return w._win
   end)
 end                    -- }}}
@@ -34,13 +34,13 @@ end                                    -- }}}
 
 function Stack:getOtherAppWindows(win) -- {{{
   -- NOTE: may not need when HS issue #2400 is closed
-  return _G.stackline.utils.filter(self:get(), function(w)
+  return stackline.utils.filter(self:get(), function(w)
     return w.app == win.app
   end)
 end                         -- }}}
 
 function Stack:anyFocused() -- {{{
-  return _G.stackline.utils.any(self.windows, function(w)
+  return stackline.utils.any(self.windows, function(w)
     return w:isFocused()
   end)
 end                                 -- }}}
@@ -76,7 +76,7 @@ function Stack:getWindowByPoint(p)
     -- Get the screen with frame that contains point 'p'
     local function findClickedScreen(_p) -- {{{
       return table.unpack(
-        _G.stackline.utils.filter(hs.screen.allScreens(), function(s)
+        stackline.utils.filter(hs.screen.allScreens(), function(s)
           return _p:inside(s:frame())
         end)
       )
@@ -89,7 +89,7 @@ function Stack:getWindowByPoint(p)
   end
 
   return table.unpack(
-    _G.stackline.utils.filter(self.windows, function(w)
+    stackline.utils.filter(self.windows, function(w)
       local indicatorFrame = w.indicator and w.indicator:canvasElements()[1].frame
       if not indicatorFrame then return false end
       return p:inside(indicatorFrame) -- NOTE: frame *must* be a hs.geometry.rect instance

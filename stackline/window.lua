@@ -130,12 +130,13 @@ end                               -- }}}
 function Window:redrawIndicator() -- {{{
   local isWindowFocused = self:isFocused()
   local isStackFocused = self:isStackFocused()
-  log.i('redrawIndicator for', self.id, self.app, "is focused:", isWindowFocused)
+  log.i('redrawIndicator for', self.id, self.app, "is window focused:", isWindowFocused)
 
   -- has stack, window focus changed?
   local stackFocusChange = isStackFocused ~= self.stackFocus
   local windowFocusChange = isWindowFocused ~= self.focus
 
+  log.i('   redrawIndicator for', self.id, self.app, "stackFocusChange:", stackFocusChange, "windowFocusChange:", windowFocusChange)
   -- permutations of stack, window change combos
   local noChange = not stackFocusChange and not windowFocusChange
   local bothChange = stackFocusChange and windowFocusChange
@@ -153,8 +154,8 @@ function Window:redrawIndicator() -- {{{
     -- If both change, it means a *focused* window's stack is now unfocused.
     self.stackFocus = isStackFocused
     self.stack:redrawAllIndicators({ except = self.id })
-    -- Despite the window being unfocused, do *not* update self.focus
-    -- (unfocused stack + focused window = last-active window)
+    log.i(self.id, self.app, "self.focused?", self.focus)
+    self.focus = isWindowFocused
   elseif onlyWinChange then
     -- changing window focus within a stack
     self.focus = isWindowFocused

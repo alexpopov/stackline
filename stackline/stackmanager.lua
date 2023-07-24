@@ -23,9 +23,9 @@ function Stackmanager:ingest(stacks, appWins, shouldClean) -- {{{
   for stackId, groupedWindows in pairs(stacks) do
     local stack = require 'stackline.stackline.stack':new(groupedWindows)
     stack.id = stackId
-    u.each(stack.windows, function(win)
+    _G.stackline.utils.each(stack.windows, function(win)
       -- win.otherAppWindows needed to workaround Hammerspoon issue #2400
-      win.otherAppWindows = u.filter(appWins[win.app], function(w)
+      win.otherAppWindows = _G.stackline.utils.filter(appWins[win.app], function(w)
         -- exclude self and other app windows from other others
         return (w.id ~= win.id) and (w.screen == win.screen)
       end)
@@ -60,15 +60,15 @@ function Stackmanager:getSummary(external) -- {{{
   local stacks = external or self.tabStacks
   return {
     numStacks = #stacks,
-    topLeft = u.map(stacks, function(s)
+    topLeft = _G.stackline.utils.map(stacks, function(s)
       local windows = external and s or s.windows
       return windows[1].topLeft
     end),
-    dimensions = u.map(stacks, function(s)
+    dimensions = _G.stackline.utils.map(stacks, function(s)
       local windows = external and s or s.windows
       return windows[1].stackId -- stackId is stringified window frame dims ("1150|93|531|962")
     end),
-    numWindows = u.map(stacks, function(s)
+    numWindows = _G.stackline.utils.map(stacks, function(s)
       local windows = external and s or s.windows
       return #windows
     end),

@@ -7,7 +7,7 @@ local function yabai(command, callback) -- {{{
 
   local task = hs.task.new(
     stackline.config:get 'paths.yabai',
-    u.task_cb(callback), -- wrap callback in json decoder
+    _G.stackline.utils.task_cb(callback), -- wrap callback in json decoder
     command:split(' ')
   ):start()
   if not task then
@@ -20,9 +20,9 @@ local function yabai(command, callback) -- {{{
 end                                       -- }}}
 
 local function stackIdMapper(yabaiWindow) -- {{{
-  -- u.p(yabaiWindow)
+  -- _G.stackline.utils.p(yabaiWindow)
   local res = {}
-  if type(yabaiWindow) ~= 'table' then u.p(yabaiWindow) end
+  if type(yabaiWindow) ~= 'table' then _G.stackline.utils.p(yabaiWindow) end
   for _, win in pairs(yabaiWindow or {}) do
     if win['stack-index'] ~= 0 then
       res[tostring(win.id)] = win['stack-index']
@@ -49,7 +49,7 @@ local function groupWindows(ws) -- {{{
   local byStack
   local byApp
 
-  local windows = u.map(ws, function(w)
+  local windows = _G.stackline.utils.map(ws, function(w)
     return stackline.window:new(w)
   end)
 
@@ -58,17 +58,17 @@ local function groupWindows(ws) -- {{{
       and 'stackIdFzy'
       or 'stackId'
 
-  byStack = u.filter(
-    u.groupBy(windows, groupKey),
-    u.greaterThan(1)) -- stacks have >1 window, so ignore 'groups' of 1
+  byStack = _G.stackline.utils.filter(
+    _G.stackline.utils.groupBy(windows, groupKey),
+    _G.stackline.utils.greaterThan(1)) -- stacks have >1 window, so ignore 'groups' of 1
 
-  if u.length(byStack) > 0 then
+  if _G.stackline.utils.length(byStack) > 0 then
     local stackedWinIds = getStackedWinIds(byStack)
-    local stackedWins = u.filter(windows, function(w)
+    local stackedWins = _G.stackline.utils.filter(windows, function(w)
       return stackedWinIds[w.id] --true if win id is in stackedWinIds
     end)
 
-    byApp = u.groupBy(stackedWins, 'app') -- app names are keys in group
+    byApp = _G.stackline.utils.groupBy(stackedWins, 'app') -- app names are keys in group
   end
 
   return byStack, byApp
@@ -76,8 +76,8 @@ end                                           -- }}}
 
 local function removeGroupedWin(win, byStack) -- {{{
   -- remove given window if it's present in byStack windows
-  return u.map(byStack, function(stack)
-    return u.filter(stack, function(w)
+  return _G.stackline.utils.map(byStack, function(stack)
+    return _G.stackline.utils.filter(stack, function(w)
       return w.id ~= win.id
     end)
   end)
@@ -100,8 +100,8 @@ local function mergeWinStackIdxs(byStack, winStackIdxs) -- {{{
     win.stackIdx = stackIdx
   end
 
-  u.each(byStack, function(stack)
-    u.each(stack, assignStackIndex)
+  _G.stackline.utils.each(byStack, function(stack)
+    _G.stackline.utils.each(stack, assignStackIndex)
   end)
 
   return byStack
@@ -115,20 +115,20 @@ local function shouldRestack(new) -- {{{
   --    • change num windows (win added / removed)
 
   local curr = stackline.manager:getSummary()
-  new = stackline.manager:getSummary(u.values(new))
+  new = stackline.manager:getSummary(_G.stackline.utils.values(new))
 
   if curr.numStacks ~= new.numStacks then
     log.i('Should refresh -> Num stacks changed')
     return true
   end
 
-  if not u.equal(curr.topLeft, new.topLeft) then
-    u.p(curr.topLeft)
+  if not _G.stackline.utils.equal(curr.topLeft, new.topLeft) then
+    _G.stackline.utils.p(curr.topLeft)
     log.i('Should refresh -> Stack position changed', curr.topLeft, new.topLeft)
     return true
   end
 
-  if not u.equal(curr.numWindows, new.numWindows) then
+  if not _G.stackline.utils.equal(curr.numWindows, new.numWindows) then
     log.i('Should refresh -> Windows changed')
     return true
   end

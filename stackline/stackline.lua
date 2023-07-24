@@ -7,8 +7,8 @@ local log   = hs.logger.new('stackline', 'info')
 local click = hs.eventtap.event.types['leftMouseDown'] -- fyi, print hs.eventtap.event.types to see all event types
 
 log.i 'Loading module: stackline'
-_G.u = require 'lib.utils'
 _G.stackline = {} -- access stackline under global 'stackline'
+_G.stackline.utils = require('lib.utils')
 stackline.config = require 'stackline.configmanager'
 stackline.window = require 'stackline.window'
 
@@ -20,7 +20,7 @@ function stackline:init(userConfig) -- {{{
   end
 
   -- init config with default settings + user overrides
-  self.config:init(u.extend(require 'stackline.conf', userConfig or {}))
+  self.config:init(_G.stackline.utils.extend(require 'stackline.conf', userConfig or {}))
 
   -- init stackmanager & run update right away
   -- NOTE: Requires self.config to be initialized first
@@ -84,7 +84,7 @@ function stackline:setupListeners() -- {{{
   -- On each win event above, run update at most once every maxRefreshRate (defaults to 0.3s))
   -- update = query window state & check if redraw needed
   self.wf:subscribe(self.events.checkOn, function(_win, _app, event)
-    self.forceRedraw = u.contains( -- forceRedraw depending on the type of event
+    self.forceRedraw = _G.stackline.utils.contains( -- forceRedraw depending on the type of event
       self.events.forceCheckOn,
       event
     )

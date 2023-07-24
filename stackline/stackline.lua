@@ -13,39 +13,40 @@ stackline.config = require 'stackline.configmanager'
 stackline.window = require 'stackline.window'
 
 function stackline:init(userConfig) -- {{{
-  log.i 'Initializing stackline'
-  if stackline.manager then         -- re-initializtion guard https://github.com/AdamWagner/stackline/issues/46
-    return log.i 'stackline already initialized'
+  log.i('Initializing stackline')
+  if stackline.manager then
+    -- re-initializtion guard https://github.com/AdamWagner/stackline/issues/46
+    return log.i('stackline already initialized')
   end
 
   -- init config with default settings + user overrides
   self.config:init(u.extend(require 'stackline.conf', userConfig or {}))
 
-  -- init stackmanager, & run update right away
+  -- init stackmanager & run update right away
   -- NOTE: Requires self.config to be initialized first
-  self.manager = require 'stackline.stackmanager':init()
+  self.manager = require('stackline.stackmanager'):init()
   self.manager:update({ forceRedraw = true })
 
   -- Reuseable update fn that runs at most once every maxRefreshRate (default 0.3s)
   -- NOTE: yabai is only called if query.shouldRestack() returns true (see ./stackline/query.lua:104)
   self.queryWindowState = timer.new(
-    self.config:get 'advanced.maxRefreshRate',
+    self.config:get('advanced.maxRefreshRate'),
     function()
       self.manager:update({ forceRedraw = self.forceRedraw })
       if (self.forceRedraw) then self.forceRedraw = false end
     end,
-    true   -- continue on error
+    true -- continue on error
   )
 
   self:setupListeners()
 
   self:setupClickTracker()
   return self
-end                                        -- }}}
+end                                         -- }}}
 
 stackline.wf = wf.new():setOverrideFilter { -- {{{
   -- Default window filter controls what hs.window 'sees'
-  visible = true,                          -- i.e., neither hidden nor minimized
+  visible = true,                           -- i.e., neither hidden nor minimized
   fullscreen = false,
   currentSpace = true,
   allowRoles = 'AXStandardWindow',
@@ -56,7 +57,7 @@ stackline.events = { -- {{{
     wf.windowCreated,
     wf.windowUnhidden,
 
-    wf.windowMoved,     -- NOTE: winMoved includes move AND resize evts
+    wf.windowMoved, -- NOTE: winMoved includes move AND resize evts
     wf.windowUnminimized,
 
     wf.windowFullscreened,
@@ -65,7 +66,7 @@ stackline.events = { -- {{{
     wf.windowDestroyed,
     wf.windowHidden,
     wf.windowMinimized,
-    wf.windowsChanged,     -- NOTE: pseudo-event for any change in list of windows. Addresses missing windowCreated events :/
+    wf.windowsChanged, -- NOTE: pseudo-event for any change in list of windows. Addresses missing windowCreated events :/
   },
   forceCheckOn = {
     wf.windowCreated,
@@ -83,7 +84,7 @@ function stackline:setupListeners() -- {{{
   -- On each win evt above, run update at most once every maxRefreshRate (defaults to 0.3s))
   -- update = query window state & check if redraw needed
   self.wf:subscribe(self.events.checkOn, function(_win, _app, evt)
-    self.forceRedraw = u.contains(     -- forceRedraw depending on the type of event
+    self.forceRedraw = u.contains( -- forceRedraw depending on the type of event
       self.events.forceCheckOn,
       evt
     )
@@ -109,7 +110,7 @@ function stackline:setupClickTracker() -- {{{
     if clickedWin then
       log.i('Clicked window at', clickAt)
       clickedWin._win:focus()
-      return true       -- stop propogation
+      return true -- stop propogation
     end
   end)
 
@@ -118,11 +119,11 @@ function stackline:setupClickTracker() -- {{{
     log.i 'ClickTracker starting'
     self.clickTracker:start()
   end
-end                                                -- }}}
+end                                               -- }}}
 
-function stackline:refreshClickTracker()           -- {{{
-  self.clickTracker:stop()                         -- always stop if running
-  if self.config:get 'features.clickToFocus' then  -- only start if feature is enabled
+function stackline:refreshClickTracker()          -- {{{
+  self.clickTracker:stop()                        -- always stop if running
+  if self.config:get 'features.clickToFocus' then -- only start if feature is enabled
     log.i 'features.clickToFocus is enabled — starting clickTracker for current space'
     self.clickTracker:start()
   end
@@ -134,11 +135,11 @@ function stackline.redrawWinIndicator(hsWin, _app, _evt) -- {{{
        particularly since this skips querying the app icon & building the icon image.
     ]]
   local stackedWin = stackline.manager:findWindow(hsWin:id())
-  if not stackedWin then return end   -- if non-existent, the focused win is not stacked
+  if not stackedWin then return end -- if non-existent, the focused win is not stacked
   stackedWin:redrawIndicator()
-end                                   -- }}}
+end                                 -- }}}
 
-function stackline:setLogLevel(lvl)   -- {{{
+function stackline:setLogLevel(lvl) -- {{{
   log.setLogLevel(lvl)
   log.i(('Window.log level set to %s'):format(lvl))
 end                                             -- }}}
@@ -149,7 +150,7 @@ stackline.spaceWatcher = hs.spaces.watcher.new( -- {{{
     -- Update stackline when switching spaces
     -- NOTE: hs.spaces.watcher uses deprecated macos APIs, so this may break in an upcoming macos release
     log.i(('hs.spaces.watcher -> changed to space %d'):format(spaceIdx))
-    stackline.forceRedraw = true     -- force the next update cycle to redraw
+    stackline.forceRedraw = true -- force the next update cycle to redraw
     stackline.queryWindowState:start()
     stackline:refreshClickTracker()
   end

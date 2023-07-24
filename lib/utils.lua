@@ -351,15 +351,13 @@ function M.roundToNearest(roundTo, numToRound) -- {{{
   return numToRound - numToRound % roundTo
 end                                            -- }}}
 
-function M.p(data, howDeep)                    -- {{{
+function M.print(data, howDeep)                    -- {{{
   -- local logger = hs.logger.new('inspect', 'debug')
   local depth = howDeep or 3
   if type(data) == 'table' then
     print(hs.inspect(data, { depth = depth }))
-    -- logger.df(hs.inspect(data, {depth = depth}))
   else
     print(hs.inspect(data, { depth = depth }))
-    -- logger.df(hs.inspect(data, {depth = depth}))
   end
 end                     -- }}}
 

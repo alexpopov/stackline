@@ -22,7 +22,7 @@ end                                       -- }}}
 local function stackIdMapper(yabaiWindow) -- {{{
   -- stackline.utils.p(yabaiWindow)
   local res = {}
-  if type(yabaiWindow) ~= 'table' then stackline.utils.p(yabaiWindow) end
+  if type(yabaiWindow) ~= 'table' then stackline.utils.print(yabaiWindow) end
   for _, win in pairs(yabaiWindow or {}) do
     if win['stack-index'] ~= 0 then
       res[tostring(win.id)] = win['stack-index']
@@ -123,7 +123,7 @@ local function shouldRestack(new) -- {{{
   end
 
   if not stackline.utils.equal(curr.topLeft, new.topLeft) then
-    stackline.utils.p(curr.topLeft)
+    stackline.utils.print(curr.topLeft)
     log.i('Should refresh -> Stack position changed', curr.topLeft, new.topLeft)
     return true
   end

@@ -7,7 +7,7 @@ local function yabai(command, callback) -- {{{
 
   local task = hs.task.new(
     stackline.config:get 'paths.yabai',
-    u.task_cb(callback),   -- wrap callback in json decoder
+    u.task_cb(callback), -- wrap callback in json decoder
     command:split(' ')
   ):start()
   if not task then
@@ -60,15 +60,15 @@ local function groupWindows(ws) -- {{{
 
   byStack = u.filter(
     u.groupBy(windows, groupKey),
-    u.greaterThan(1))     -- stacks have >1 window, so ignore 'groups' of 1
+    u.greaterThan(1)) -- stacks have >1 window, so ignore 'groups' of 1
 
   if u.length(byStack) > 0 then
     local stackedWinIds = getStackedWinIds(byStack)
     local stackedWins = u.filter(windows, function(w)
-      return stackedWinIds[w.id]       --true if win id is in stackedWinIds
+      return stackedWinIds[w.id] --true if win id is in stackedWinIds
     end)
 
-    byApp = u.groupBy(stackedWins, 'app')     -- app names are keys in group
+    byApp = u.groupBy(stackedWins, 'app') -- app names are keys in group
   end
 
   return byStack, byApp
@@ -134,17 +134,17 @@ local function shouldRestack(new) -- {{{
   end
 
   log.i('Should not redraw.')
-end                                                                -- }}}
+end                                                              -- }}}
 
-local function run(opts)                                           -- {{{
+local function run(opts)                                         -- {{{
   opts                 = opts or {}
-  local byStack, byApp = groupWindows(stackline.wf:getWindows())   -- set byStack & self.appWindows
+  local byStack, byApp = groupWindows(stackline.wf:getWindows()) -- set byStack & self.appWindows
 
   -- Check if space has stacks...
   local spaceHasStacks = stackline.manager:getSummary().numStacks > 0
 
-  local shouldRefresh  = spaceHasStacks and
-  shouldRestack(byStack)                                            -- Don't even check on a space that doesn't have any stacks
+  -- Don't even check on a space that doesn't have any stacks
+  local shouldRefresh  = spaceHasStacks and shouldRestack(byStack)
 
   if shouldRefresh or opts.forceRedraw then
     log.i('Refreshing stackline')
@@ -153,8 +153,8 @@ local function run(opts)                                           -- {{{
 
     yabai(yabai_cmd, function(yabaiRes)
       local winStackIdxs = stackIdMapper(yabaiRes)
-      stackline.manager:ingest(                           -- hand over to stackmanager
-        mergeWinStackIdxs(byStack, winStackIdxs),         -- Add the stack indexes from yabai to byStack
+      stackline.manager:ingest(                   -- hand over to stackmanager
+        mergeWinStackIdxs(byStack, winStackIdxs), -- Add the stack indexes from yabai to byStack
         byApp,
         spaceHasStacks
       )

@@ -30,7 +30,7 @@ function Stackmanager:ingest(stacks, appWins, shouldClean) -- {{{
         return (w.id ~= win.id) and (w.screen == win.screen)
       end)
       -- TODO: fix error with nil stack field (??): window.lua:32: attempt to index a nil value (field 'stack')
-      win.stack = stack       -- enables calling stack methods from window
+      win.stack = stack -- enables calling stack methods from window
     end)
     table.insert(self.tabStacks, stack)
     self:resetAllIndicators()
@@ -66,7 +66,7 @@ function Stackmanager:getSummary(external) -- {{{
     end),
     dimensions = u.map(stacks, function(s)
       local windows = external and s or s.windows
-      return windows[1].stackId       -- stackId is stringified window frame dims ("1150|93|531|962")
+      return windows[1].stackId -- stackId is stringified window frame dims ("1150|93|531|962")
     end),
     numWindows = u.map(stacks, function(s)
       local windows = external and s or s.windows

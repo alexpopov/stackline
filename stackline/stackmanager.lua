@@ -21,7 +21,7 @@ function Stackmanager:ingest(stacks, appWins, shouldClean) -- {{{
   if shouldClean then self:cleanup() end
 
   for stackId, groupedWindows in pairs(stacks) do
-    local stack = require 'stackline.stackline.stack':new(groupedWindows)
+    local stack = require('stackline.stackline.stack'):new(groupedWindows)
     stack.id = stackId
     stackline.utils.each(stack.windows, function(win)
       -- win.otherAppWindows needed to workaround Hammerspoon issue #2400

@@ -41,6 +41,6 @@ c.features.fzyFrameDetect.fuzzFactor = 30                -- Window frame dimensi
 c.features.winTitles                 = 'not_implemented' -- Valid options: false, true, 'when_switching', 'not_implemented'
 c.features.dynamicLuminosity         = 'not_implemented' -- Valid options: false, true, 'not_implemented'
 
-c.advanced.maxRefreshRate            = 0.5               -- How aggressively to refresh Stackline. Higher = slower response time + less battery drain
+c.advanced.maxRefreshRate            = 0.5               -- How aggressively to refresh Stackline, in seconds. Higher = slower response time + less battery drain
 
 return c

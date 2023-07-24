@@ -19,11 +19,15 @@ local function yabai(command, callback) -- {{{
   end
 end                                       -- }}}
 
+--- @param yabaiWindow table
+--- @return { string : integer }
 local function stackIdMapper(yabaiWindow) -- {{{
   -- stackline.utils.p(yabaiWindow)
   local res = {}
+  -- debugging, in case we didn't get a table...
   if type(yabaiWindow) ~= 'table' then stackline.utils.print(yabaiWindow) end
   for _, win in pairs(yabaiWindow or {}) do
+    -- 0 means it's not stacked
     if win['stack-index'] ~= 0 then
       res[tostring(win.id)] = win['stack-index']
     end
@@ -156,7 +160,7 @@ local function run(opts)                                         -- {{{
       stackline.manager:ingest(                   -- hand over to stackmanager
         mergeWinStackIdxs(byStack, winStackIdxs), -- Add the stack indexes from yabai to byStack
         byApp,
-        spaceHasStacks
+        spaceHasStacks -- should clean
       )
     end)
   end

@@ -6,7 +6,7 @@ log.i('Loading module: utils')
 function string:split(p) -- {{{
   -- Splits the string [s] into substrings wherever pattern [p] occurs.
   -- Returns: a table of substrings or, a table with the string as the only element
-  p = p or '%s'   -- split on space by default
+  p = p or '%s' -- split on space by default
   local temp = {}
   local index = 0
   local last_index = self:len()
@@ -218,9 +218,9 @@ function table.merge(t1, t2) -- {{{
     local all_array = u.all({ v, target }, u.isarray)
 
     if all_array then
-      t1[k] = u.concat(t1[k], v)          --luacheck: ignore 143
+      t1[k] = u.concat(t1[k], v)     --luacheck: ignore 143
     elseif all_tbl then
-      t1[k] = table.merge(target, v)      --luacheck: ignore 143
+      t1[k] = table.merge(target, v) --luacheck: ignore 143
     else
       t1[k] = v
     end
@@ -262,11 +262,11 @@ function u.task_cb(fn) -- {{{
   return function(...)
     local out = { ... }
 
-    local is_hstask = function(x)   -- {{{
+    local is_hstask = function(x) -- {{{
       return #x == 3
           and tonumber(x[1])
           and u.isstring(x[2])
-    end   -- }}}
+    end -- }}}
 
     if is_hstask(out) then
       local stdout = out[2]
@@ -290,13 +290,13 @@ end                                 -- }}}
 function u.setfield(path, val, tbl) -- {{{
   log.d(('u.setfield: %s, val: %s'):format(path, val))
 
-  tbl = tbl or _G                 -- start with the table of globals
+  tbl = tbl or _G           -- start with the table of globals
   for w, d in path:gmatch('([%w_]+)(.?)') do
-    if d == '.' then              -- not last field?
-      tbl[w] = tbl[w] or {}       -- create table if absent
-      tbl = tbl[w]                -- get the table
-    else                          -- last field
-      tbl[w] = val                -- do the assignment
+    if d == '.' then        -- not last field?
+      tbl[w] = tbl[w] or {} -- create table if absent
+      tbl = tbl[w]          -- get the table
+    else                    -- last field
+      tbl[w] = val          -- do the assignment
     end
   end
 end                                    -- }}}
@@ -305,13 +305,13 @@ function u.getfield(path, tbl, isSafe) -- {{{
   -- NOTE: isSafe defaults to false
   log.d(('u.getfield: %s (isSafe = %s)'):format(path, isSafe))
 
-  local val = tbl or _G   -- start with the table of globals
+  local val = tbl or _G -- start with the table of globals
   local res = nil
 
   for path_seg in path:gmatch('[%w_]+') do
-    if not u.istable(val) then return val end     -- if v isn't table, return immediately
-    val = val[path_seg]                           -- lookup next val
-    if (val ~= nil) then res = val end            -- only update safe result if v not null
+    if not u.istable(val) then return val end -- if v isn't table, return immediately
+    val = val[path_seg]                       -- lookup next val
+    if (val ~= nil) then res = val end        -- only update safe result if v not null
   end
 
   return isSafe and val == nil
@@ -523,10 +523,10 @@ function u.flatten(t) -- {{{
     end
   end
   return ret
-end                                                                 -- }}}
+end                                                               -- }}}
 
-function u.flattenPath(tbl)                                         -- {{{
-  local function flatten(input, mdepth, depth, prefix, res, circ)   -- {{{
+function u.flattenPath(tbl)                                       -- {{{
+  local function flatten(input, mdepth, depth, prefix, res, circ) -- {{{
     local k, v = next(input)
     while k do
       local pk = prefix .. k
@@ -537,7 +537,7 @@ function u.flattenPath(tbl)                                         -- {{{
         if not circ[ref] then
           if mdepth > 0 and depth >= mdepth then
             res[pk] = v
-          else           -- set value except circular referenced value
+          else -- set value except circular referenced value
             circ[ref] = true
             local nextPrefix = pk .. '.'
             flatten(v, mdepth, depth + 1, nextPrefix, res, circ)
@@ -548,7 +548,7 @@ function u.flattenPath(tbl)                                         -- {{{
       k, v = next(input, k)
     end
     return res
-  end   -- }}}
+  end -- }}}
 
   local maxdepth = 0
   local prefix = ''

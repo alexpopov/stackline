@@ -73,8 +73,8 @@ function M.print_err(error_list, parents)
   -- Iterates over the list of messages.
   for key, err in pairs(error_list) do -- If it is a node, print it.
     if type(err) == 'string' then
-      error_output = format('%s\n%s%s %s', error_output, parents ,key, err)
-    else                               -- If it is a table, recurse it.
+      error_output = format('%s\n%s%s %s', error_output, parents, key, err)
+    else -- If it is a table, recurse it.
       error_output = format('%s%s', error_output, M.print_err(err, format('%s%s.', parents, key)))
     end
   end
@@ -118,7 +118,7 @@ end
 ---
 function M.is_integer()
   return function(value)
-    if type(value) ~= 'number' or value%1 ~= 0 then
+    if type(value) ~= 'number' or value % 1 ~= 0 then
       return false, error_message(value, 'an integer')
     end
     return true
@@ -176,7 +176,7 @@ function M.is_array(child_validator, is_object)
     if type(value) == 'table' then
       for index in pairs(value) do
         if not is_object and type(index) ~= 'number' then
-          insert(err_array, error_message(value, 'an array') )
+          insert(err_array, error_message(value, 'an array'))
         else
           result, err = child_validator(value[index], index, value)
           if not result then
@@ -185,7 +185,7 @@ function M.is_array(child_validator, is_object)
         end
       end
     else
-      insert(err_array, error_message(value, 'an array') )
+      insert(err_array, error_message(value, 'an array'))
     end
 
     if next(err_array) == nil then
@@ -209,7 +209,8 @@ end
 ---
 function M.optional(validator)
   return function(value, key, data)
-    if not value then return true
+    if not value then
+      return true
     else
       return validator(value, key, data)
     end
@@ -232,7 +233,8 @@ end
 ---
 function M.or_op(validator_a, validator_b)
   return function(value, key, data)
-    if not value then return true
+    if not value then
+      return true
     else
       local valid, err_a = validator_a(value, key, data)
       if not valid then
@@ -324,7 +326,7 @@ function M.is_table(schema, tolerant)
       _, err = validate_table({}, schema, tolerant)
       if not err then err = {} end
       result = false
-      insert(err, error_message(value, 'a table') )
+      insert(err, error_message(value, 'a table'))
     else
       result, err = validate_table(value, schema, tolerant)
     end
@@ -344,7 +346,6 @@ end
 --   String describing the error or true.
 ---
 function validate_table(data, schema, tolerant)
-
   -- Array of error messages.
   local errs = {}
   -- Check if the data is empty.
@@ -358,7 +359,7 @@ function validate_table(data, schema, tolerant)
     end
   end
 
-   -- Iterates over the keys of the data table.
+  -- Iterates over the keys of the data table.
   for key in pairs(schema) do
     -- Calls a function in the table and validates it.
     local result, err = schema[key](data[key], key, data)

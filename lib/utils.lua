@@ -64,24 +64,24 @@ function table.slice(t, from, to) -- {{{
 end -- }}}
 
 -- === utils module ===
-local u        = {}
+local M        = {}
 
 -- Alias hs.fnutils methods
-u.map          = hs.fnutils.map
-u.filter       = hs.fnutils.filter
-u.reduce       = hs.fnutils.reduce
-u.partial      = hs.fnutils.partial
-u.each         = hs.fnutils.each
-u.contains     = hs.fnutils.contains
-u.some         = hs.fnutils.some
-u.any          = hs.fnutils.some  -- alias 'some()' as 'any()'
-u.all          = hs.fnutils.every -- alias 'every()' as 'all()'
-u.concat       = hs.fnutils.concat
-u.copy         = hs.fnutils.copy
-u.sortByKeys   = hs.fnutils.sortByKeys
-u.sortByValues = hs.fnutils.sortByKeyValues
+M.map          = hs.fnutils.map
+M.filter       = hs.fnutils.filter
+M.reduce       = hs.fnutils.reduce
+M.partial      = hs.fnutils.partial
+M.each         = hs.fnutils.each
+M.contains     = hs.fnutils.contains
+M.some         = hs.fnutils.some
+M.any          = hs.fnutils.some  -- alias 'some()' as 'any()'
+M.all          = hs.fnutils.every -- alias 'every()' as 'all()'
+M.concat       = hs.fnutils.concat
+M.copy         = hs.fnutils.copy
+M.sortByKeys   = hs.fnutils.sortByKeys
+M.sortByValues = hs.fnutils.sortByKeyValues
 
-function u.length(t) -- {{{
+function M.length(t) -- {{{
   if type(t) ~= 'table' then return 0 end
   local count = 0
   for _ in next, t do
@@ -90,7 +90,7 @@ function u.length(t) -- {{{
   return count
 end                     -- }}}
 
-function u.reverse(tbl) -- {{{
+function M.reverse(tbl) -- {{{
   -- Reverses values in a given array. The passed-in array should not be sparse.
   local res = {}
   for i = #tbl, 1, -1 do
@@ -99,56 +99,56 @@ function u.reverse(tbl) -- {{{
   return res
 end                   -- }}}
 
-function u.flip(func) -- {{{
+function M.flip(func) -- {{{
   -- Flips the order of parameters passed to a function
   return function(...)
-    return func(table.unpack(u.reverse({ ... })))
+    return func(table.unpack(M.reverse({ ... })))
   end
 end                        -- }}}
 
-function u.pipe(f, g, ...) -- {{{
+function M.pipe(f, g, ...) -- {{{
   local function simpleCompose(f1, g1)
     return function(...)
       return f1(g1(...))
     end
   end
 
-  if (g == nil) then return f or u.identity end
+  if (g == nil) then return f or M.identity end
   local nextFn = simpleCompose(g, f)
 
-  return u.pipe(nextFn, ...)
+  return M.pipe(nextFn, ...)
 end                    -- }}}
 
-function u.isnum(x)    -- {{{
+function M.isnum(x)    -- {{{
   return type(x) == 'number'
 end                    -- }}}
 
-function u.istable(x)  -- {{{
+function M.istable(x)  -- {{{
   return type(x) == 'table'
 end                    -- }}}
 
-function u.isstring(x) -- {{{
+function M.isstring(x) -- {{{
   return type(x) == 'string'
 end                    -- }}}
 
-function u.isbool(x)   -- {{{
+function M.isbool(x)   -- {{{
   return type(x) == 'boolean'
 end                    -- }}}
 
-function u.isfunc(x)   -- {{{
+function M.isfunc(x)   -- {{{
   return type(x) == 'function'
 end                    -- }}}
 
-function u.isarray(x)  -- {{{
-  return u.istable(x) and x[1] ~= nil and x[u.length(x)] ~= nil
+function M.isarray(x)  -- {{{
+  return M.istable(x) and x[1] ~= nil and x[M.length(x)] ~= nil
 end                    -- }}}
 
-function u.isjson(x)   -- {{{
-  return u.isstring(x) and x:find('{') and x:find('}')
+function M.isjson(x)   -- {{{
+  return M.isstring(x) and x:find('{') and x:find('}')
 end                    -- }}}
 
-function u.getiter(x)  -- {{{
-  if u.isarray(x) then
+function M.getiter(x)  -- {{{
+  if M.isarray(x) then
     return ipairs(x)
   elseif type(x) == "table" then
     return pairs(x)
@@ -156,17 +156,17 @@ function u.getiter(x)  -- {{{
   error("expected table", 3)
 end                -- }}}
 
-function u.keys(t) -- {{{
+function M.keys(t) -- {{{
   local rtn = {}
-  for k in u.getiter(t) do
+  for k in M.getiter(t) do
     rtn[#rtn + 1] = k
   end
   return rtn
 end                     -- }}}
 
-function u.find(t, val) -- {{{
+function M.find(t, val) -- {{{
   result = nil
-  for k, v in u.getiter(t) do
+  for k, v in M.getiter(t) do
     if k == val then
       result = v
     end
@@ -174,11 +174,11 @@ function u.find(t, val) -- {{{
   return result
 end                      -- }}}
 
-function u.identity(val) -- {{{
+function M.identity(val) -- {{{
   return val
 end                      -- }}}
 
-function u.values(t)     -- {{{
+function M.values(t)     -- {{{
   local values = {}
   for _k, v in pairs(t) do
     values[#values + 1] = v
@@ -186,8 +186,8 @@ function u.values(t)     -- {{{
   return values
 end                      -- }}}
 
-function u.from_iter(it) -- {{{
-  if u.istable(it) then
+function M.from_iter(it) -- {{{
+  if M.istable(it) then
     return it
   end
   local res = {}
@@ -197,12 +197,12 @@ function u.from_iter(it) -- {{{
   return res
 end                  -- }}}
 
-function u.uniq(tbl) -- {{{
+function M.uniq(tbl) -- {{{
   local res = {}
   for _, v in ipairs(tbl) do
     res[v] = true
   end
-  return u.keys(res)
+  return M.keys(res)
 end                          -- }}}
 
 function table.merge(t1, t2) -- {{{
@@ -214,11 +214,11 @@ function table.merge(t1, t2) -- {{{
 
   for k, v in pairs(t2) do
     local target = t1[k]
-    local all_tbl = u.all({ v, target }, u.istable)
-    local all_array = u.all({ v, target }, u.isarray)
+    local all_tbl = M.all({ v, target }, M.istable)
+    local all_array = M.all({ v, target }, M.isarray)
 
     if all_array then
-      t1[k] = u.concat(t1[k], v)     --luacheck: ignore 143
+      t1[k] = M.concat(t1[k], v)     --luacheck: ignore 143
     elseif all_tbl then
       t1[k] = table.merge(target, v) --luacheck: ignore 143
     else
@@ -228,36 +228,36 @@ function table.merge(t1, t2) -- {{{
   return t1
 end                       -- }}}
 
-function u.extend(t1, t2) -- {{{
-  for k, v in u.getiter(t2) do
+function M.extend(t1, t2) -- {{{
+  for k, v in M.getiter(t2) do
     t1[k] = v
   end
   return t1
 end                          -- }}}
 
-function u.include(tbl, val) -- {{{
+function M.include(tbl, val) -- {{{
   for _k, v in ipairs(tbl) do
-    if u.equal(v, val) then
+    if M.equal(v, val) then
       return true
     end
   end
   return false
 end               -- }}}
 
-function u.cb(fn) -- {{{
+function M.cb(fn) -- {{{
   return function()
     return fn
   end
 end                    -- }}}
 
-function u.json_cb(fn) -- {{{
+function M.json_cb(fn) -- {{{
   -- wrap fn to decode json arg
   return function(...)
-    return u.pipe(hs.json.decode, fn, ...)
+    return M.pipe(hs.json.decode, fn, ...)
   end
 end                    -- }}}
 
-function u.task_cb(fn) -- {{{
+function M.task_cb(fn) -- {{{
   -- wrap callback given to hs.task
   return function(...)
     local out = { ... }
@@ -265,13 +265,13 @@ function u.task_cb(fn) -- {{{
     local is_hstask = function(x) -- {{{
       return #x == 3
           and tonumber(x[1])
-          and u.isstring(x[2])
+          and M.isstring(x[2])
     end -- }}}
 
     if is_hstask(out) then
       local stdout = out[2]
 
-      if u.isjson(stdout) then
+      if M.isjson(stdout) then
         -- NOTE: hs.json.decode cannot parse "inf" values
         -- yabai response may have "inf" values: e.g., frame":{"x":inf,"y":inf,"w":0.0000,"h":0.0000}
         -- So, we must replace ":inf," with ":0,"
@@ -287,8 +287,8 @@ function u.task_cb(fn) -- {{{
   end
 end                                 -- }}}
 
-function u.setfield(path, val, tbl) -- {{{
-  log.d(('u.setfield: %s, val: %s'):format(path, val))
+function M.setfield(path, val, tbl) -- {{{
+  log.d(('M.setfield: %s, val: %s'):format(path, val))
 
   tbl = tbl or _G           -- start with the table of globals
   for w, d in path:gmatch('([%w_]+)(.?)') do
@@ -301,15 +301,15 @@ function u.setfield(path, val, tbl) -- {{{
   end
 end                                    -- }}}
 
-function u.getfield(path, tbl, isSafe) -- {{{
+function M.getfield(path, tbl, isSafe) -- {{{
   -- NOTE: isSafe defaults to false
-  log.d(('u.getfield: %s (isSafe = %s)'):format(path, isSafe))
+  log.d(('M.getfield: %s (isSafe = %s)'):format(path, isSafe))
 
   local val = tbl or _G -- start with the table of globals
   local res = nil
 
   for path_seg in path:gmatch('[%w_]+') do
-    if not u.istable(val) then return val end -- if v isn't table, return immediately
+    if not M.istable(val) then return val end -- if v isn't table, return immediately
     val = val[path_seg]                       -- lookup next val
     if (val ~= nil) then res = val end        -- only update safe result if v not null
   end
@@ -319,7 +319,7 @@ function u.getfield(path, tbl, isSafe) -- {{{
       or val           -- else return last value found, even if nil
 end                    -- }}}
 
-function u.toBool(val) -- {{{
+function M.toBool(val) -- {{{
   local t = type(val)
 
   if t == 'boolean' then
@@ -341,17 +341,17 @@ function u.toBool(val) -- {{{
   return false
 end                       -- }}}
 
-function u.greaterThan(n) -- {{{
+function M.greaterThan(n) -- {{{
   return function(t)
     return #t > n
   end
 end                                            -- }}}
 
-function u.roundToNearest(roundTo, numToRound) -- {{{
+function M.roundToNearest(roundTo, numToRound) -- {{{
   return numToRound - numToRound % roundTo
 end                                            -- }}}
 
-function u.p(data, howDeep)                    -- {{{
+function M.p(data, howDeep)                    -- {{{
   -- local logger = hs.logger.new('inspect', 'debug')
   local depth = howDeep or 3
   if type(data) == 'table' then
@@ -363,14 +363,14 @@ function u.p(data, howDeep)                    -- {{{
   end
 end                     -- }}}
 
-function u.pheader(str) -- {{{
+function M.pheader(str) -- {{{
   print('\n\n\n')
   print("========================================")
   print(string.upper(str), '==========')
   print("========================================")
 end                      -- }}}
 
-function u.groupBy(t, f) -- {{{
+function M.groupBy(t, f) -- {{{
   -- FROM: https://github.com/pyrodogg/AdventOfCode/blob/1ff5baa57c0a6a86c40f685ba6ab590bd50c2148/2019/lua/util.lua#L149
   local res = {}
   for _k, v in pairs(t) do
@@ -391,7 +391,7 @@ function u.groupBy(t, f) -- {{{
   return res
 end                  -- }}}
 
-function u.zip(a, b) -- {{{
+function M.zip(a, b) -- {{{
   local rv = {}
   local idx = 1
   local len = math.min(#a, #b)
@@ -402,22 +402,22 @@ function u.zip(a, b) -- {{{
   return rv
 end                       -- }}}
 
-function u.copyShallow(t) -- {{{
+function M.copyShallow(t) -- {{{
   -- FROM: https://github.com/XavierCHN/go/blob/master/game/go/scripts/vscripts/utils/table.lua
   local copy
 
-  if not u.istable(t) then
+  if not M.istable(t) then
     copy = t
     return copy
   end
 
-  for k, v in u.getiter(t) do
+  for k, v in M.getiter(t) do
     copy[k] = v
   end
   return copy
 end                            -- }}}
 
-function u.deepCopy(obj, seen) -- {{{
+function M.deepCopy(obj, seen) -- {{{
   -- from https://gist.githubusercontent.com/tylerneylon/81333721109155b2d244/raw/5d610d32f493939e56efa6bebbcd2018873fb38c/copy.lua
   -- The issue here is that the following code will call itself
   -- indefinitely and ultimately cause a stack overflow:
@@ -438,45 +438,45 @@ function u.deepCopy(obj, seen) -- {{{
   -- may accidentally trigger a custom __index() or __newindex()!
 
   -- Handle non-tables and previously-seen tables.
-  if not u.istable(obj) then return obj end
+  if not M.istable(obj) then return obj end
   if seen and seen[obj] then return seen[obj] end
 
   -- New table; mark it as seen and copy recursively.
   local s = seen or {}
   local res = {}
   s[obj] = res
-  for k, v in u.getiter(obj) do
-    res[u.deepCopy(k, s)] = u.deepCopy(v, s)
+  for k, v in M.getiter(obj) do
+    res[M.deepCopy(k, s)] = M.deepCopy(v, s)
   end
   return setmetatable(res, getmetatable(obj))
 end                          -- }}}
 
-function u.safeSort(tbl, fn) -- {{{
+function M.safeSort(tbl, fn) -- {{{
   -- WANRING: Sorting mutates table
   fn = fn or function(x, y) return x < y end
-  if u.isarray(tbl) then
+  if M.isarray(tbl) then
     table.sort(tbl, fn)
   end
   return tbl
 end                    -- }}}
 
-function u.equal(a, b) -- {{{
+function M.equal(a, b) -- {{{
   if a == b then
     return true
   end
 
-  local all_tbls = u.all({ a, b }, u.istable)
+  local all_tbls = M.all({ a, b }, M.istable)
 
-  if all_tbls and (u.length(a) ~= u.length(b))
+  if all_tbls and (M.length(a) ~= M.length(b))
       or a == nil
       or b == nil
   then
     return false
   end
 
-  u.each({ a, b }, u.safeSort)
+  M.each({ a, b }, M.safeSort)
 
-  for k in u.getiter(a) do
+  for k in M.getiter(a) do
     if b[k] ~= a[k] then
       return false
     end
@@ -485,7 +485,7 @@ function u.equal(a, b) -- {{{
   return true
 end                                        -- }}}
 
-function u.levenshteinDistance(str1, str2) -- {{{
+function M.levenshteinDistance(str1, str2) -- {{{
   str1, str2 = str1:lower(), str2:lower()
   local len1, len2 = #str1, #str2
   local c1, c2, dist = {}, {}, {}
@@ -506,16 +506,16 @@ function u.levenshteinDistance(str1, str2) -- {{{
   return dist[len1][len2] / #str2
 end                   -- }}}
 
-function u.flatten(t) -- {{{
-  if not u.isarray(t) then
-    log.i('u.flatten expects array-type tbl, given dict-type tbl')
+function M.flatten(t) -- {{{
+  if not M.isarray(t) then
+    log.i('M.flatten expects array-type tbl, given dict-type tbl')
     return t
   end
 
   local ret = {}
   for _, v in ipairs(t) do
-    if u.istable(v) then
-      for _, fv in ipairs(u.flatten(v)) do
+    if M.istable(v) then
+      for _, fv in ipairs(M.flatten(v)) do
         ret[#ret + 1] = fv
       end
     else
@@ -525,12 +525,12 @@ function u.flatten(t) -- {{{
   return ret
 end                                                               -- }}}
 
-function u.flattenPath(tbl)                                       -- {{{
+function M.flattenPath(tbl)                                       -- {{{
   local function flatten(input, mdepth, depth, prefix, res, circ) -- {{{
     local k, v = next(input)
     while k do
       local pk = prefix .. k
-      if not u.istable(v) then
+      if not M.istable(v) then
         res[pk] = v
       else
         local ref = tostring(v)
@@ -558,4 +558,4 @@ function u.flattenPath(tbl)                                       -- {{{
   return flatten(tbl, maxdepth, 1, prefix, result, circularRef)
 end -- }}}
 
-return u
+return M

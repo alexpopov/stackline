@@ -22,7 +22,7 @@ log.i('Loading module: stackline.configmanager')
 local Config = {}
 
 Config.types = {
-  -- validator & coerce mthods for each type found in stackline config
+  -- validator & coerce methods for each type found in stackline config
   ['string'] = {
     validator = v.is_string,
     coerce = tostring,
@@ -107,7 +107,7 @@ Config.schema = {
 }
 
 function Config:init(conf)
-  log.i('Initializing configmanager…')
+  log.i('Initializing configmanager...')
   self:validate(conf)
   self.__index = self
   return self

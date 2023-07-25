@@ -3,7 +3,7 @@ local log = hs.logger.new('utils', 'info')
 log.i('Loading module: utils')
 
 -- === Extend builtins ===
-function string:split(p) 
+function string:split(p)
   -- Splits the string [s] into substrings wherever pattern [p] occurs.
   -- Returns: a table of substrings or, a table with the string as the only element
   p = p or '%s' -- split on space by default
@@ -30,15 +30,15 @@ function string:split(p)
   end
 
   return temp
-end                               
+end
 
-function string:trim()            
+function string:trim()
   return self
       :gsub('^%s+', '')           -- trim leading whitespace
       :gsub('%s+$', '')           -- trim trailing whitespace
-end                               
+end
 
-function table.slice(t, from, to) 
+function table.slice(t, from, to)
   -- Returns a partial table sliced from t, equivalent to t[x:y] in certain languages.
   -- Negative indices will be used to access the table from the other end.
   local n = #t
@@ -61,7 +61,7 @@ function table.slice(t, from, to)
   end
 
   return res
-end 
+end
 
 -- === utils module ===
 local M        = {}
@@ -81,32 +81,32 @@ M.copy         = hs.fnutils.copy
 M.sortByKeys   = hs.fnutils.sortByKeys
 M.sortByValues = hs.fnutils.sortByKeyValues
 
-function M.length(t) 
+function M.length(t)
   if type(t) ~= 'table' then return 0 end
   local count = 0
   for _ in next, t do
     count = count + 1
   end
   return count
-end                     
+end
 
-function M.reverse(tbl) 
+function M.reverse(tbl)
   -- Reverses values in a given array. The passed-in array should not be sparse.
   local res = {}
   for i = #tbl, 1, -1 do
     res[#res + 1] = tbl[i]
   end
   return res
-end                   
+end
 
-function M.flip(func) 
+function M.flip(func)
   -- Flips the order of parameters passed to a function
   return function(...)
     return func(table.unpack(M.reverse({ ... })))
   end
-end                        
+end
 
-function M.pipe(f, g, ...) 
+function M.pipe(f, g, ...)
   local function simpleCompose(f1, g1)
     return function(...)
       return f1(g1(...))
@@ -117,54 +117,54 @@ function M.pipe(f, g, ...)
   local nextFn = simpleCompose(g, f)
 
   return M.pipe(nextFn, ...)
-end                    
+end
 
-function M.isnum(x)    
+function M.isnum(x)
   return type(x) == 'number'
-end                    
+end
 
-function M.istable(x)  
+function M.istable(x)
   return type(x) == 'table'
-end                    
+end
 
-function M.isstring(x) 
+function M.isstring(x)
   return type(x) == 'string'
-end                    
+end
 
-function M.isbool(x)   
+function M.isbool(x)
   return type(x) == 'boolean'
-end                    
+end
 
-function M.isfunc(x)   
+function M.isfunc(x)
   return type(x) == 'function'
-end                    
+end
 
-function M.isarray(x)  
+function M.isarray(x)
   return M.istable(x) and x[1] ~= nil and x[M.length(x)] ~= nil
-end                    
+end
 
-function M.isjson(x)   
+function M.isjson(x)
   return M.isstring(x) and x:find('{') and x:find('}')
-end                    
+end
 
-function M.getiter(x)  
+function M.getiter(x)
   if M.isarray(x) then
     return ipairs(x)
   elseif type(x) == "table" then
     return pairs(x)
   end
   error("expected table", 3)
-end                
+end
 
-function M.keys(t) 
+function M.keys(t)
   local rtn = {}
   for k in M.getiter(t) do
     rtn[#rtn + 1] = k
   end
   return rtn
-end                     
+end
 
-function M.find(t, val) 
+function M.find(t, val)
   result = nil
   for k, v in M.getiter(t) do
     if k == val then
@@ -172,21 +172,21 @@ function M.find(t, val)
     end
   end
   return result
-end                      
+end
 
-function M.identity(val) 
+function M.identity(val)
   return val
-end                      
+end
 
-function M.values(t)     
+function M.values(t)
   local values = {}
   for _k, v in pairs(t) do
     values[#values + 1] = v
   end
   return values
-end                      
+end
 
-function M.from_iter(it) 
+function M.from_iter(it)
   if M.istable(it) then
     return it
   end
@@ -195,17 +195,17 @@ function M.from_iter(it)
     table.insert(res, item)
   end
   return res
-end                  
+end
 
-function M.uniq(tbl) 
+function M.uniq(tbl)
   local res = {}
   for _, v in ipairs(tbl) do
     res[v] = true
   end
   return M.keys(res)
-end                          
+end
 
-function table.merge(t1, t2) 
+function table.merge(t1, t2)
   --[[ TEST
     y = {blocks = { 'adam', 1, 2,'3', 99, 3 }, 7, 8, 9}
     z = {'a', 'b', 'c', name = 'JohnDoe', blocks = { 'test',2,3} }
@@ -226,47 +226,55 @@ function table.merge(t1, t2)
     end
   end
   return t1
-end                       
+end
 
-function M.extend(t1, t2) 
+function M.extend(t1, t2)
   for k, v in M.getiter(t2) do
-    t1[k] = v
+    if (type(t1[k]) == 'table' and type(v) == 'table') then
+      print("t1 key " .. k .. " and other value are tables, we're gonna extend recursively!")
+      local extended = M.extend(t1[k], v)
+      print("extended successfully: ")
+      M.print(extended)
+      t1[k] = extended
+    else
+      t1[k] = v
+    end
   end
   return t1
-end                          
+end
 
-function M.include(tbl, val) 
+function M.include(tbl, val)
   for _k, v in ipairs(tbl) do
     if M.equal(v, val) then
       return true
     end
   end
   return false
-end               
+end
 
-function M.cb(fn) 
+function M.cb(fn)
   return function()
     return fn
   end
-end                    
+end
 
-function M.json_cb(fn) 
+function M.json_cb(fn)
   -- wrap fn to decode json arg
   return function(...)
     return M.pipe(hs.json.decode, fn, ...)
   end
-end                    
+end
 
-function M.task_cb(fn) 
+function M.task_cb(fn)
   -- wrap callback given to hs.task
   return function(...)
     local out = { ... }
 
-    local is_hstask = function(x) 
+    local is_hstask = function(x)
       return #x == 3
           and tonumber(x[1])
           and M.isstring(x[2])
-    end 
+    end
 
     if is_hstask(out) then
       local stdout = out[2]
@@ -285,9 +293,9 @@ function M.task_cb(fn)
     -- fallback if 'out' is not from hs.task
     return fn(out)
   end
-end                                 
+end
 
-function M.setfield(path, val, tbl) 
+function M.setfield(path, val, tbl)
   log.d(('M.setfield: %s, val: %s'):format(path, val))
 
   tbl = tbl or _G           -- start with the table of globals
@@ -299,9 +307,9 @@ function M.setfield(path, val, tbl)
       tbl[w] = val          -- do the assignment
     end
   end
-end                                    
+end
 
-function M.getfield(path, tbl, isSafe) 
+function M.getfield(path, tbl, isSafe)
   -- NOTE: isSafe defaults to false
   log.d(('M.getfield: %s (isSafe = %s)'):format(path, isSafe))
 
@@ -317,9 +325,9 @@ function M.getfield(path, tbl, isSafe)
   return isSafe and val == nil
       and res          -- return last non-nil value found
       or val           -- else return last value found, even if nil
-end                    
+end
 
-function M.toBool(val) 
+function M.toBool(val)
   local t = type(val)
 
   if t == 'boolean' then
@@ -339,19 +347,19 @@ function M.toBool(val)
 
   print(string.format('toBool(val): Cannot convert %q to boolean. Returning "false"', val))
   return false
-end                       
+end
 
-function M.greaterThan(n) 
+function M.greaterThan(n)
   return function(t)
     return #t > n
   end
-end                                            
+end
 
-function M.roundToNearest(roundTo, numToRound) 
+function M.roundToNearest(roundTo, numToRound)
   return numToRound - numToRound % roundTo
-end                                            
+end
 
-function M.print(data, howDeep)                    
+function M.print(data, howDeep)
   -- local logger = hs.logger.new('inspect', 'debug')
   local depth = howDeep or 3
   if type(data) == 'table' then
@@ -359,16 +367,16 @@ function M.print(data, howDeep)
   else
     print(hs.inspect(data, { depth = depth }))
   end
-end                     
+end
 
-function M.pheader(str) 
+function M.pheader(str)
   print('\n\n\n')
   print("========================================")
   print(string.upper(str), '==========')
   print("========================================")
-end                      
+end
 
-function M.groupBy(t, f) 
+function M.groupBy(t, f)
   -- FROM: https://github.com/pyrodogg/AdventOfCode/blob/1ff5baa57c0a6a86c40f685ba6ab590bd50c2148/2019/lua/util.lua#L149
   local res = {}
   for _k, v in pairs(t) do
@@ -387,9 +395,9 @@ function M.groupBy(t, f)
     table.insert(res[g], v)
   end
   return res
-end                  
+end
 
-function M.zip(a, b) 
+function M.zip(a, b)
   local rv = {}
   local idx = 1
   local len = math.min(#a, #b)
@@ -398,9 +406,9 @@ function M.zip(a, b)
     idx = idx + 1
   end
   return rv
-end                       
+end
 
-function M.copyShallow(t) 
+function M.copyShallow(t)
   -- FROM: https://github.com/XavierCHN/go/blob/master/game/go/scripts/vscripts/utils/table.lua
   local copy
 
@@ -413,9 +421,9 @@ function M.copyShallow(t)
     copy[k] = v
   end
   return copy
-end                            
+end
 
-function M.deepCopy(obj, seen) 
+function M.deepCopy(obj, seen)
   -- from https://gist.githubusercontent.com/tylerneylon/81333721109155b2d244/raw/5d610d32f493939e56efa6bebbcd2018873fb38c/copy.lua
   -- The issue here is that the following code will call itself
   -- indefinitely and ultimately cause a stack overflow:
@@ -447,18 +455,18 @@ function M.deepCopy(obj, seen)
     res[M.deepCopy(k, s)] = M.deepCopy(v, s)
   end
   return setmetatable(res, getmetatable(obj))
-end                          
+end
 
-function M.safeSort(tbl, fn) 
+function M.safeSort(tbl, fn)
   -- WANRING: Sorting mutates table
   fn = fn or function(x, y) return x < y end
   if M.isarray(tbl) then
     table.sort(tbl, fn)
   end
   return tbl
-end                    
+end
 
-function M.equal(a, b) 
+function M.equal(a, b)
   if a == b then
     return true
   end
@@ -481,9 +489,9 @@ function M.equal(a, b)
   end
 
   return true
-end                                        
+end
 
-function M.levenshteinDistance(str1, str2) 
+function M.levenshteinDistance(str1, str2)
   str1, str2 = str1:lower(), str2:lower()
   local len1, len2 = #str1, #str2
   local c1, c2, dist = {}, {}, {}
@@ -502,9 +510,9 @@ function M.levenshteinDistance(str1, str2)
     end
   end
   return dist[len1][len2] / #str2
-end                   
+end
 
-function M.flatten(t) 
+function M.flatten(t)
   if not M.isarray(t) then
     log.i('M.flatten expects array-type tbl, given dict-type tbl')
     return t
@@ -521,10 +529,10 @@ function M.flatten(t)
     end
   end
   return ret
-end                                                               
+end
 
-function M.flattenPath(tbl)                                       
-  local function flatten(input, mdepth, depth, prefix, res, circ) 
+function M.flattenPath(tbl)
+  local function flatten(input, mdepth, depth, prefix, res, circ)
     local k, v = next(input)
     while k do
       local pk = prefix .. k
@@ -546,7 +554,7 @@ function M.flattenPath(tbl)
       k, v = next(input, k)
     end
     return res
-  end 
+  end
 
   local maxdepth = 0
   local prefix = ''
@@ -554,6 +562,6 @@ function M.flattenPath(tbl)
   local circularRef = { [tostring(tbl)] = true }
 
   return flatten(tbl, maxdepth, 1, prefix, result, circularRef)
-end 
+end
 
 return M

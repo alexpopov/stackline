@@ -1,69 +1,69 @@
 local Stack = {}
 
-function Stack:new(stackedWindows) -- {{{
+function Stack:new(stackedWindows) 
   local stack = {
     windows = stackedWindows
   }
   setmetatable(stack, self)
   self.__index = self
   return stack
-end                    -- }}}
+end                    
 
-function Stack:get()   -- {{{
+function Stack:get()   
   return self.windows
-end                    -- }}}
+end                    
 
-function Stack:getHs() -- {{{
+function Stack:getHs() 
   return stackline.utils.map(self.windows, function(w)
     return w._win
   end)
-end                    -- }}}
+end                    
 
-function Stack:frame() -- {{{
+function Stack:frame() 
   -- All stacked windows have the same dimensions,
   -- so the 1st Hs window's frame is ~= to the stack's frame
   -- TODO: Incorrect when the 1st window has min-size < stack width. See ./query.lua:105
   return self.windows[1]._win:frame()
-end                        -- }}}
+end                        
 
-function Stack:eachWin(fn) -- {{{
+function Stack:eachWin(fn) 
   for _idx, win in pairs(self.windows) do
     fn(win)
   end
-end                                    -- }}}
+end                                    
 
-function Stack:getOtherAppWindows(win) -- {{{
+function Stack:getOtherAppWindows(win) 
   -- NOTE: may not need when HS issue #2400 is closed
   return stackline.utils.filter(self:get(), function(w)
     return w.app == win.app
   end)
-end                         -- }}}
+end                         
 
-function Stack:anyFocused() -- {{{
+function Stack:anyFocused() 
   return stackline.utils.any(self.windows, function(w)
     return w:isFocused()
   end)
-end                                 -- }}}
+end                                 
 
-function Stack:resetAllIndicators() -- {{{
+function Stack:resetAllIndicators() 
   self:eachWin(function(w)
     w:setupIndicator():drawIndicator()
   end)
-end                                      -- }}}
+end                                      
 
-function Stack:redrawAllIndicators(opts) -- {{{
+function Stack:redrawAllIndicators(opts) 
   self:eachWin(function(win)
     if win.id ~= opts.except then
       win:redrawIndicator()
     end
   end)
-end                                  -- }}}
+end                                  
 
-function Stack:deleteAllIndicators() -- {{{
+function Stack:deleteAllIndicators() 
   self:eachWin(function(win)
     win:deleteIndicator()
   end)
-end -- }}}
+end 
 
 function Stack:getWindowByPoint(p)
   if p.x < 0 or p.y < 0 then
@@ -74,13 +74,13 @@ function Stack:getWindowByPoint(p)
     -- TODO: Clean this up after fix is confirmed
 
     -- Get the screen with frame that contains point 'p'
-    local function findClickedScreen(_p) -- {{{
+    local function findClickedScreen(_p) 
       return table.unpack(
         stackline.utils.filter(hs.screen.allScreens(), function(s)
           return _p:inside(s:frame())
         end)
       )
-    end -- }}}
+    end 
 
     local clickedScren = findClickedScreen(p)
     p = clickedScren

@@ -1,7 +1,7 @@
 local log = hs.logger.new('query', 'info')
 log.i('Loading module: query')
 
-local function yabai(command, callback) -- {{{
+local function yabai(command, callback) 
   callback = callback or function(x) return x end
   command = '-m ' .. command
 
@@ -17,11 +17,11 @@ local function yabai(command, callback) -- {{{
       " " .. command .. "'. " .. "Please check logs above this message to find out what went wrong."
     )
   end
-end                                       -- }}}
+end                                       
 
 --- @param yabaiWindow table
 --- @return { string : integer }
-local function stackIdMapper(yabaiWindow) -- {{{
+local function stackIdMapper(yabaiWindow) 
   -- stackline.utils.p(yabaiWindow)
   local res = {}
   -- debugging, in case we didn't get a table...
@@ -33,9 +33,9 @@ local function stackIdMapper(yabaiWindow) -- {{{
     end
   end
   return res
-end                                      -- }}}
+end                                      
 
-local function getStackedWinIds(byStack) -- {{{
+local function getStackedWinIds(byStack) 
   local stackedWinIds = {}
   for _, group in pairs(byStack) do
     for _, win in pairs(group) do
@@ -43,9 +43,9 @@ local function getStackedWinIds(byStack) -- {{{
     end
   end
   return stackedWinIds
-end                             -- }}}
+end                             
 
-local function groupWindows(ws) -- {{{
+local function groupWindows(ws) 
   -- Given windows from hs.window.filter:
   --    1. Create stackline window objects
   --    2. Group wins by `stackId` prop (aka top-left frame coords)
@@ -76,18 +76,18 @@ local function groupWindows(ws) -- {{{
   end
 
   return byStack, byApp
-end                                           -- }}}
+end                                           
 
-local function removeGroupedWin(win, byStack) -- {{{
+local function removeGroupedWin(win, byStack) 
   -- remove given window if it's present in byStack windows
   return stackline.utils.map(byStack, function(stack)
     return stackline.utils.filter(stack, function(w)
       return w.id ~= win.id
     end)
   end)
-end                                                     -- }}}
+end                                                     
 
-local function mergeWinStackIdxs(byStack, winStackIdxs) -- {{{
+local function mergeWinStackIdxs(byStack, winStackIdxs) 
   -- merge windowID <> stack-index mapping queried from yabai into window objs
 
   local function assignStackIndex(win)
@@ -109,9 +109,9 @@ local function mergeWinStackIdxs(byStack, winStackIdxs) -- {{{
   end)
 
   return byStack
-end                               -- }}}
+end                               
 
-local function shouldRestack(new) -- {{{
+local function shouldRestack(new) 
   -- Analyze byStack to determine if a stack refresh is needed
   --  * change num stacks (+/-)
   --  * changes to existing stack
@@ -138,9 +138,9 @@ local function shouldRestack(new) -- {{{
   end
 
   log.i('Should not redraw.')
-end                                                              -- }}}
+end                                                              
 
-local function run(opts)                                         -- {{{
+local function run(opts)                                         
   opts                 = opts or {}
   local byStack, byApp = groupWindows(stackline.wf:getWindows()) -- set byStack & self.appWindows
 
@@ -164,7 +164,7 @@ local function run(opts)                                         -- {{{
       )
     end)
   end
-end -- }}}
+end 
 
 return {
   run = run,

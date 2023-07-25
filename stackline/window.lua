@@ -3,7 +3,7 @@ log.i('Loading module: window')
 
 local Window = {}
 
-function Window:new(hsWin) -- {{{
+function Window:new(hsWin) 
   local stackIdResult = self:makeStackId(hsWin)
   local ws = {
     title      = hsWin:title(),              -- window title
@@ -23,22 +23,22 @@ function Window:new(hsWin) -- {{{
   log.i(('Window:new(%s)'):format(ws.id))
 
   return ws
-end                         -- }}}
+end                         
 
-function Window:isFocused() -- {{{
+function Window:isFocused() 
   local focusedWin = hs.window.focusedWindow()
   if focusedWin == nil then
     return false
   end
   local isFocused = self.id == focusedWin:id()
   return isFocused
-end                              -- }}}
+end                              
 
-function Window:isStackFocused() -- {{{
+function Window:isStackFocused() 
   return self.stack:anyFocused()
-end                              -- }}}
+end                              
 
-function Window:setupIndicator() -- {{{
+function Window:setupIndicator() 
   log.d('setupIndicator for', self.id, self.app)
   self.config = stackline.config:get('appearance')
   local c = self.config
@@ -77,9 +77,9 @@ function Window:setupIndicator() -- {{{
     h = self.indicator_rect.h - (c.iconPadding * 2),
   }
   return self
-end                                         -- }}}
+end                                         
 
-function Window:drawIndicator(overrideOpts) -- {{{
+function Window:drawIndicator(overrideOpts) 
   -- TODO: should there be a dedicated "Indicator" class to perform the actual drawing?
   local opts = stackline.utils.extend(self.config, overrideOpts or {})
   local radius = self.showIcons and self.iconRadius or opts.radius
@@ -125,9 +125,9 @@ function Window:drawIndicator(overrideOpts) -- {{{
   self.indicator:clickActivating(false) -- clicking on a canvas elment should NOT bring Hammerspoon wins to front
   self.indicator:show(fadeDuration)
   return self
-end                               -- }}}
+end                               
 
-function Window:redrawIndicator() -- {{{
+function Window:redrawIndicator() 
   local isWindowFocused = self:isFocused()
   local isStackFocused = self:isStackFocused()
   log.i('redrawIndicator for', self.id, self.app, "is window focused:", isWindowFocused)
@@ -194,9 +194,9 @@ function Window:redrawIndicator() -- {{{
     icon.imageAlpha = colorAttrs.img
   end
   rect.shadow = self:getShadowAttrs(f)
-end                             -- }}}
+end                             
 
-function Window:getScreenSide() -- {{{
+function Window:getScreenSide() 
   -- Returns the side of the screen that the window is (mostly) on
   -- Retval: "left" or "right"
   local thresh      = 0.75
@@ -220,9 +220,9 @@ function Window:getScreenSide() -- {{{
   --      stackline.wf:windowsToWest(self._win)
   --    https://www.hammerspoon.org/docs/hs.window.html#windowsToWest
   --      self._win:windowsToSouth() }}}
-end                                    -- }}}
+end                                    
 
-function Window:getIndicatorPosition() -- {{{
+function Window:getIndicatorPosition() 
   -- Display indicators on left edge of windows on the left side of the screen,
   -- & right edge of windows on the right side of the screen
   local xval
@@ -241,9 +241,9 @@ function Window:getIndicatorPosition() -- {{{
     xval = math.max(xval, 0)                        -- don't go beyond left screen edge
   end
   return xval
-end                                                         -- }}}
+end                                                         
 
-function Window:getColorAttrs(isStackFocused, isWinFocused) -- {{{
+function Window:getColorAttrs(isStackFocused, isWinFocused) 
   local opts = self.config
   -- Lookup bg color and image alpha based on stack + window focus
   -- e.g., fillColor = self:getColorAttrs(self.stackFocus, self.focus).bg
@@ -290,9 +290,9 @@ function Window:getColorAttrs(isStackFocused, isWinFocused) -- {{{
   local isStackFocusedKey = tostring(isStackFocused)
   local isWinFocusedKey = tostring(isWinFocused)
   return colorLookup.stack[isStackFocusedKey].window[isWinFocusedKey]
-end                              -- }}}
+end                              
 
-function Window:getShadowAttrs() -- {{{
+function Window:getShadowAttrs() 
   -- less opaque & blurry when iconsDisabled
   -- even less opaque & blurry when unfocused
   local iconsDisabledDimmer = stackline.manager:getShowIconsState() and 1 or 5
@@ -317,14 +317,14 @@ function Window:getShadowAttrs() -- {{{
     color = { alpha = 1 / alphaDimmer }, -- TODO align all alpha values to be defined like this (1/X)
     offset = offset,
   }
-end                               -- }}}
+end                               
 
-function Window:iconFromAppName() -- {{{
+function Window:iconFromAppName() 
   appBundle = hs.appfinder.appFromName(self.app):bundleID()
   return hs.image.imageFromAppBundle(appBundle)
-end                                -- }}}
+end                                
 
-function Window:makeStackId(hsWin) -- {{{
+function Window:makeStackId(hsWin) 
   local frame = hsWin:frame():floor()
 
   local x = frame.x
@@ -341,25 +341,25 @@ function Window:makeStackId(hsWin) -- {{{
     stackId = table.concat({ x, y, w, h }, '|'),
     fzyFrame = table.concat(ff, '|'),
   }
-end                               -- }}}
+end                               
 
-function Window:deleteIndicator() -- {{{
+function Window:deleteIndicator() 
   log.d('deleteIndicator for', self.id, self.app)
   if self.indicator then
     self.indicator:delete(self.config.fadeDuration)
   end
-end                                      -- }}}
+end                                      
 
-function Window:unfocusOtherAppWindows() -- {{{
+function Window:unfocusOtherAppWindows() 
   log.i('unfocusOtherAppWindows for', self.id, self.app)
   stackline.utils.each(self.otherAppWindows, function(w)
     w:redrawIndicator()
   end)
-end                              -- }}}
+end                              
 
-function Window:setLogLevel(lvl) -- {{{
+function Window:setLogLevel(lvl) 
   log.setLogLevel(lvl)
   log.i(('Window.log level set to %s'):format(lvl))
-end -- }}}
+end 
 
 return Window

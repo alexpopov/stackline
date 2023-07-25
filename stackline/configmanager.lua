@@ -21,7 +21,7 @@ log.i('Loading module: stackline.configmanager')
 
 local Config = {}
 
-Config.types = { -- {{{
+Config.types = { 
   -- validator & coerce mthods for each type found in stackline config
   ['string'] = {
     validator = v.is_string,
@@ -51,13 +51,13 @@ Config.types = { -- {{{
     validator = stackline.utils.cb(v.in_list { true, false, 'not_implemented' }),
     coerce = stackline.utils.identity,
   },
-}                              -- }}}
+}                              
 
-local defaultOnChangeEvt = {   -- {{{
+local defaultOnChangeEvt = {   
   __index = function() stackline.queryWindowState:start() end
-}                              -- }}}
+}                              
 
-Config.events = setmetatable({ -- {{{
+Config.events = setmetatable({ 
   -- Map stackline actions to config keys
   -- If config key changes, perform action
   appearance = function() stackline.manager:resetAllIndicators() end,
@@ -71,9 +71,9 @@ Config.events = setmetatable({ -- {{{
   advanced = {
     maxRefreshRate = function() print('Needs implemented') end,
   },
-}, defaultOnChangeEvt) -- }}}
+}, defaultOnChangeEvt) 
 
-Config.schema = {      -- {{{
+Config.schema = {      
   -- Set type for each stackline config key
   paths = {
     yabai = 'string'
@@ -104,24 +104,24 @@ Config.schema = {      -- {{{
   advanced = {
     maxRefreshRate = 'number',
   }
-}                          -- }}}
+}                          
 
-function Config:init(conf) -- {{{
+function Config:init(conf) 
   log.i('Initializing configmanager…')
   self:validate(conf)
   self.__index = self
   return self
-end                                             -- }}}
+end                                             
 
-function Config:getPathSchema(path)             -- {{{
+function Config:getPathSchema(path)             
   local _type = stackline.utils.getfield(path, self.schema)   -- lookup type in schema
   if not _type then return false end
   local validator = self.types[_type].validator()
 
   return _type, validator
-end                                           -- }}}
+end                                           
 
-function Config.generateValidator(schemaType) -- {{{
+function Config.generateValidator(schemaType) 
   if stackline.utils.istable(schemaType) then               -- recursively build validator
     local children = stackline.utils.map(schemaType, Config.generateValidator)
     log.d('validator children:\n', hs.inspect(children))
@@ -133,9 +133,9 @@ function Config.generateValidator(schemaType) -- {{{
   return Config.types[schemaType]                    -- if schemaType is a known config type..
       and Config.types[schemaType].validator()       -- then return validation fn
       or unknownTypeValidator                        -- otherwise, unknown types are assumed valid
-end                                                  -- }}}
+end                                                  
 
-function Config:validate(conf)                       -- {{{
+function Config:validate(conf)                       
   local c            = conf or self.conf
   local validate     = self.generateValidator(self.schema)
   local isValid, err = validate(c)
@@ -156,15 +156,15 @@ function Config:validate(conf)                       -- {{{
   end
 
   return isValid, err
-end                                 -- }}}
+end                                 
 
-function Config:getOrSet(path, val) -- {{{
+function Config:getOrSet(path, val) 
   return (path and val)
       and self:set(path, val)
       or self:get(path)
-end                       -- }}}
+end                       
 
-function Config:get(path) -- {{{
+function Config:get(path) 
   -- path is a dot-separated string, e.g., 'appearance.color'
   -- returns value at path or full config if path not provided
   if path == nil then return self.conf end
@@ -176,9 +176,9 @@ function Config:get(path) -- {{{
 
   log.d(('get(%s) found: %s'):format(path, val))
   return val
-end                            -- }}}
+end                            
 
-function Config:set(path, val) -- {{{
+function Config:set(path, val) 
   -- path is a dot-separated string, e.g., 'appearance.color'
   -- val is the value to set at path
   -- non-existent path segments will be set to an empty table
@@ -202,9 +202,9 @@ function Config:set(path, val) -- {{{
   if stackline.utils.isfunc(onChange) then onChange() end
 
   return self, val
-end                         -- }}}
+end                         
 
-function Config:toggle(key) -- {{{
+function Config:toggle(key) 
   local val = self:get(key)
   if not stackline.utils.isbool(val) then
     log.w(key, 'cannot be toggled because it is not boolean')
@@ -213,11 +213,11 @@ function Config:toggle(key) -- {{{
   local toggledVal = not val
   log.i('Toggling', key, 'from ', val, 'to ', toggledVal)
   self:set(key, toggledVal)
-end                              -- }}}
+end                              
 
-function Config:setLogLevel(lvl) -- {{{
+function Config:setLogLevel(lvl) 
   log.setLogLevel(lvl)
   log.i(('Window.log level set to %s'):format(lvl))
-end -- }}}
+end 
 
 return Config

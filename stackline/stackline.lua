@@ -11,7 +11,7 @@ stackline.utils = require('lib.utils')
 stackline.config = require 'stackline.configmanager'
 stackline.window = require 'stackline.window'
 
-function stackline:init(userConfig) -- {{{
+function stackline:init(userConfig) 
   log.i('Initializing stackline')
   if stackline.manager then
     -- re-initializtion guard https://github.com/AdamWagner/stackline/issues/46
@@ -41,17 +41,17 @@ function stackline:init(userConfig) -- {{{
 
   self:setupClickTracker()
   return self
-end                                         -- }}}
+end                                         
 
-stackline.wf = wf.new():setOverrideFilter { -- {{{
+stackline.wf = wf.new():setOverrideFilter { 
   -- Default window filter controls what hs.window 'sees'
   visible = true,                           -- i.e., neither hidden nor minimized
   fullscreen = false,
   currentSpace = true,
   allowRoles = 'AXStandardWindow',
-}                    -- }}}
+}                    
 
-stackline.events = { -- {{{
+stackline.events = { 
   checkOn = {
     wf.windowCreated,
     wf.windowUnhidden,
@@ -77,9 +77,9 @@ stackline.events = { -- {{{
     wf.windowNotVisible,
     wf.windowUnfocused,
   }
-}                                   -- }}}
+}                                   
 
-function stackline:setupListeners() -- {{{
+function stackline:setupListeners() 
   -- On each win event above, run update at most once every maxRefreshRate (defaults to 0.3s))
   -- update = query window state & check if redraw needed
   self.wf:subscribe(self.events.checkOn, function(_win, _app, event)
@@ -98,9 +98,9 @@ function stackline:setupListeners() -- {{{
     self.events.redrawOn,
     self.redrawWinIndicator
   )
-end                                    -- }}}
+end                                    
 
-function stackline:setupClickTracker() -- {{{
+function stackline:setupClickTracker() 
   -- Listen for left mouse click events
   -- If indicator containing the clickAt position can be found, focus that indicator's window
   self.clickTracker = hs.eventtap.new({ click }, function(e)
@@ -118,17 +118,17 @@ function stackline:setupClickTracker() -- {{{
     log.i 'ClickTracker starting'
     self.clickTracker:start()
   end
-end                                               -- }}}
+end                                               
 
-function stackline:refreshClickTracker()          -- {{{
+function stackline:refreshClickTracker()          
   self.clickTracker:stop()                        -- always stop if running
   if self.config:get 'features.clickToFocus' then -- only start if feature is enabled
     log.i 'features.clickToFocus is enabled — starting clickTracker for current space'
     self.clickTracker:start()
   end
-end                                                      -- }}}
+end                                                      
 
-function stackline.redrawWinIndicator(hsWin, _app, _event) -- {{{
+function stackline.redrawWinIndicator(hsWin, _app, _event) 
   --[[ Dedicated redraw method to *adjust* the existing canvas element is WAY
        faster than deleting the entire indicator & rebuilding it from scratch,
        particularly since this skips querying the app icon & building the icon image.
@@ -136,14 +136,14 @@ function stackline.redrawWinIndicator(hsWin, _app, _event) -- {{{
   local stackedWin = stackline.manager:findWindow(hsWin:id())
   if not stackedWin then return end -- if non-existent, the focused win is not stacked
   stackedWin:redrawIndicator()
-end                                 -- }}}
+end                                 
 
-function stackline:setLogLevel(lvl) -- {{{
+function stackline:setLogLevel(lvl) 
   log.setLogLevel(lvl)
   log.i(('Window.log level set to %s'):format(lvl))
-end                                             -- }}}
+end                                             
 
-stackline.spaceWatcher = hs.spaces.watcher.new( -- {{{
+stackline.spaceWatcher = hs.spaces.watcher.new( 
   function(spaceIdx)
     -- QUESTION: do I need to clean this up? If so, how?
     -- Update stackline when switching spaces
@@ -153,6 +153,6 @@ stackline.spaceWatcher = hs.spaces.watcher.new( -- {{{
     stackline.queryWindowState:start()
     stackline:refreshClickTracker()
   end
-):start() -- }}}
+):start() 
 
 return stackline

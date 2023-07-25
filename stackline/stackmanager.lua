@@ -4,20 +4,20 @@ local Stackmanager = {}
 
 Stackmanager.query = require 'stackline.stackline.query'
 
-function Stackmanager:init() -- {{{
+function Stackmanager:init() 
   self.tabStacks = {}
   self.showIcons = stackline.config:get('appearance.showIcons')
   self.__index = self
   return self
-end                                                        -- }}}
+end                                                        
 
-function Stackmanager:update(opts)                         -- {{{
+function Stackmanager:update(opts)                         
   log.i('Running update()')
   self.query.run(opts)                                     -- calls Stack:ingest when ready
   return self
-end                                                        -- }}}
+end                                                        
 
-function Stackmanager:ingest(stacks, appWins, shouldClean) -- {{{
+function Stackmanager:ingest(stacks, appWins, shouldClean) 
   if shouldClean then self:cleanup() end
 
   for stackId, groupedWindows in pairs(stacks) do
@@ -35,26 +35,26 @@ function Stackmanager:ingest(stacks, appWins, shouldClean) -- {{{
     table.insert(self.tabStacks, stack)
     self:resetAllIndicators()
   end
-end                                 -- }}}
+end                                 
 
-function Stackmanager:get()         -- {{{
+function Stackmanager:get()         
   return self.tabStacks
-end                                 -- }}}
+end                                 
 
-function Stackmanager:eachStack(fn) -- {{{
+function Stackmanager:eachStack(fn) 
   for _stackId, stack in pairs(self.tabStacks) do
     fn(stack)
   end
-end                             -- }}}
+end                             
 
-function Stackmanager:cleanup() -- {{{
+function Stackmanager:cleanup() 
   self:eachStack(function(stack)
     stack:deleteAllIndicators()
   end)
   self.tabStacks = {}
-end                                        -- }}}
+end                                        
 
-function Stackmanager:getSummary(external) -- {{{
+function Stackmanager:getSummary(external) 
   -- Summarizes all stacks on the current space, making it easy to determine
   -- what needs to be updated (if anything)
   local stacks = external or self.tabStacks
@@ -73,15 +73,15 @@ function Stackmanager:getSummary(external) -- {{{
       return #windows
     end),
   }
-end                                        -- }}}
+end                                        
 
-function Stackmanager:resetAllIndicators() -- {{{
+function Stackmanager:resetAllIndicators() 
   self:eachStack(function(stack)
     stack:resetAllIndicators()
   end)
-end                                   -- }}}
+end                                   
 
-function Stackmanager:findWindow(wid) -- {{{
+function Stackmanager:findWindow(wid) 
   -- NOTE: A window must be *in* a stack to be found with this method!
   for _stackId, stack in pairs(self.tabStacks) do
     for _idx, win in pairs(stack.windows) do
@@ -90,9 +90,9 @@ function Stackmanager:findWindow(wid) -- {{{
       end
     end
   end
-end                                          -- }}}
+end                                          
 
-function Stackmanager:findStackByWindow(win) -- {{{
+function Stackmanager:findStackByWindow(win) 
   -- NOTE: may not need when Hammerspoon #2400 is closed
   -- NOTE 2: Currently unused, since reference to "otherAppWindows" is sstored
   -- directly on each window. Likely to be useful, tho, so keeping it around.
@@ -101,13 +101,13 @@ function Stackmanager:findStackByWindow(win) -- {{{
       return stack
     end
   end
-end                                           -- }}}
+end                                           
 
-function Stackmanager:getShowIconsState()     -- {{{
+function Stackmanager:getShowIconsState()     
   return self.showIcons
-end                                           -- }}}
+end                                           
 
-function Stackmanager:getClickedWindow(point) -- {{{
+function Stackmanager:getClickedWindow(point) 
   -- given the coordinates of a mouse click, return the first window whose
   -- indicator element encompasses the point, or nil if none.
   for _stackId, stack in pairs(self.tabStacks) do
@@ -116,11 +116,11 @@ function Stackmanager:getClickedWindow(point) -- {{{
       return clickedWindow
     end
   end
-end                                    -- }}}
+end                                    
 
-function Stackmanager:setLogLevel(lvl) -- {{{
+function Stackmanager:setLogLevel(lvl) 
   log.setLogLevel(lvl)
   log.i(('Window.log level set to %s'):format(lvl))
-end -- }}}
+end 
 
 return Stackmanager

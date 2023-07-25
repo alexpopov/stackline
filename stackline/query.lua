@@ -113,10 +113,10 @@ end                               -- }}}
 
 local function shouldRestack(new) -- {{{
   -- Analyze byStack to determine if a stack refresh is needed
-  --  • change num stacks (+/-)
-  --  • changes to existing stack
-  --    • change position
-  --    • change num windows (win added / removed)
+  --  * change num stacks (+/-)
+  --  * changes to existing stack
+  --    * change position
+  --    * change num windows (win added / removed)
 
   local curr = stackline.manager:getSummary()
   new = stackline.manager:getSummary(stackline.utils.values(new))

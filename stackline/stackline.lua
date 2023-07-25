@@ -27,7 +27,7 @@ function stackline:init(userConfig) -- {{{
   self.manager:update({ forceRedraw = true })
 
   -- Reuseable update fn that runs at most once every maxRefreshRate (default 0.3s)
-  -- NOTE: yabai is only called if query.shouldRestack() returns true (see ./stackline/query.lua:104)
+  -- NOTE: yabai is only called if query.shouldRestack() returns true (see ./stackline/query.lua:114)
   self.queryWindowState = timer.new(
     self.config:get('advanced.maxRefreshRate'),
     function()
